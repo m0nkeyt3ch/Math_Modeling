@@ -1,24 +1,25 @@
-//----- Include files ----------------------------------------------------------
-#include <stdio.h>              // Needed for printf()
-#include <stdlib.h>             // Needed for exit() and rand()
-#include <math.h>               // Needed for log()
+#define _CRT_SECURE_NO_WARNINGS
+//---Include File---//
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 
-//----- Constants --------------------------------------------------------------
-#define SIM_TIME   1.0e6        // Simulation time
-#define ARR_TIME   1.25         // Mean time between arrivals
-#define SERV_TIME  1.00         // Mean service time
+//function prototype
+double exponential(double x);
 
-//----- Function prototypes ----------------------------------------------------
-double expntl(double x);        // Generate exponential RV with mean x
-
-//===== Main program ===========================================================
+//Main Program
 int main(void)
 {
-  double   end_time = SIM_TIME; // Total time to simulate
-  double   Ta = ARR_TIME;       // Mean time between arrivals
-  double   Ts = SERV_TIME;      // Mean service time
+	double SIM_TIME, ARR_TIME, SERV_TIME;
+	printf("Input:\n");
+	printf(" Simulation Time : ");
+	scanf("%lf", &SIM_TIME);
+	printf(" Arrival Time    : ");
+	scanf("%lf", &ARR_TIME);
+	printf(" Service Time    : ");
+	scanf("%lf", &SERV_TIME); //User Input for 模拟时间， 平均到达时间，平均服务时间
 
-  double   time = 0.0;          // Simulation time
+	double   time = 0.0;          // Simulation time
   double   t1 = 0.0;            // Time for next event #1 (arrival)
   double   t2 = SIM_TIME;       // Time for next event #2 (departure)
   unsigned int n = 0;           // Number of customers in the system
@@ -33,8 +34,8 @@ int main(void)
   double   l;                   // Mean number in the system
   double   w;                   // Mean residence time
 
-  // Main simulation loop
-  while (time < end_time)
+	// Main simulation loop
+  while (time < SIM_TIME)
   {
     if (t1 < t2)                // *** Event #1 (arrival) ***
     {
@@ -42,11 +43,11 @@ int main(void)
       s = s + n * (time - tn);  // Update area under "s" curve
       n++;
       tn = time;                // tn = "last event time" for next event
-      t1 = time + expntl(Ta);
+      t1 = time + exponential(ARR_TIME);
       if (n == 1)
       {
         tb = time;              // Set "last start of busy time"
-        t2 = time + expntl(Ts);
+        t2 = time + exponential(SERV_TIME);
       }
     }
     else                        // *** Event #2 (departure) ***
@@ -57,7 +58,7 @@ int main(void)
       tn = time;                // tn = "last event time" for next event
       c++;                      // Increment number of completions
       if (n > 0)
-        t2 = time + expntl(Ts);
+        t2 = time + exponential(SERV_TIME);
       else
       {
         t2 = SIM_TIME;
@@ -72,31 +73,27 @@ int main(void)
   l = s / time;   // Compute mean number in system
   w = l / x;      // Compute mean residence or system time
 
-  // Output results
+	// Output results
   printf("=============================================================== \n");
   printf("=            *** Results from M/M/1 simulation ***            = \n");
   printf("=============================================================== \n");
-  printf("=  Total simulated time         = %3.4f sec   \n", end_time);
+  printf("=  Total simulated time         = %3.4f sec   \n", SIM_TIME);
   printf("=============================================================== \n");
   printf("=  INPUTS:                                    \n");
-  printf("=    Mean time between arrivals = %f sec      \n", Ta);
-  printf("=    Mean service time          = %f sec      \n", Ts);
+  printf("=    Mean time between arrivals = %f sec      \n", ARR_TIME);
+  printf("=    Mean service time          = %f sec      \n", SERV_TIME);
   printf("=============================================================== \n");
   printf("=  OUTPUTS:                                   \n");
-  printf("=    Number of completions      = %ld cust    \n", c);
-  printf("=    Throughput rate            = %f cust/sec \n", x);
-  printf("=    Server utilization         = %f %%       \n", 100.0 * u);
+  printf("=    Number of completions      = %ld cust    \n", c);	//顾客数目
+  printf("=    Throughput rate            = %f cust/sec \n", x);	
+  printf("=    Server utilization         = %f %%       \n", 100.0 * u); //服务器利用率
   printf("=    Mean number in system      = %f cust     \n", l);
-  printf("=    Mean residence time        = %f sec      \n", w);
+  printf("=    Mean residence time        = %f sec      \n", w);	//平均等待时间
   printf("=============================================================== \n");
 }
 
-//==============================================================================
-//=  Function to generate exponentially distributed RVs using inverse method   =
-//=    - Input:  x (mean value of distribution)                                =
-//=    - Output: Returns with exponential RV                                   =
-//==============================================================================
-double expntl(double x)
+
+double exponential(double x)
 {
   double z;                     // Uniform random number from 0 to 1
 
